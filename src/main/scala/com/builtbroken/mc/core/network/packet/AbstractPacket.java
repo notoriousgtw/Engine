@@ -1,5 +1,8 @@
 package com.builtbroken.mc.core.network.packet;
 
+import com.builtbroken.mc.abstraction.framework.world.Player;
+import com.builtbroken.mc.api.wrapper.IPlayer;
+import com.builtbroken.mc.framework.network.INetPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,16 +11,16 @@ import net.minecraft.entity.player.EntityPlayer;
  * Base object for all custom packets using in VoltzEngine.
  * </p>
  * Ensure that there is always a default constructor so forge can create the packet.
- * <p/>
- * <p/>
+ * <p>
+ * <p>
  * An NPE will be thrown if the packet is not registered due to {@link com.builtbroken.mc.core.network.netty.PacketManager} not knowing how to handle it
- * <p/>
+ * <p>
  * See {@link com.builtbroken.mc.core.network.netty.PacketManager#sendToAll(AbstractPacket)} for exact usage on sending the packet
  *
  * @author tgame14, DarkCow
  * @since 26/05/14
  */
-public abstract class AbstractPacket
+public abstract class AbstractPacket implements INetPacket
 {
 
     /**
@@ -63,5 +66,17 @@ public abstract class AbstractPacket
     public void handleServerSide(EntityPlayer player)
     {
         throw new UnsupportedOperationException("Unsupported operation for Packet: " + getClass().getSimpleName());
+    }
+
+    @Override
+    public void handleClientSide(IPlayer player)
+    {
+        handleClientSide(((Player) player).getPlayer());
+    }
+
+    @Override
+    public void handleServerSide(IPlayer player)
+    {
+        handleServerSide(((Player) player).getPlayer());
     }
 }

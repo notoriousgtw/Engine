@@ -1,12 +1,11 @@
 package com.builtbroken.mc.prefab.tile;
 
+import com.builtbroken.mc.api.save.ISaveTag;
 import com.builtbroken.mc.api.tile.IRotation;
+import com.builtbroken.mc.api.wrapper.IEntity;
+import com.builtbroken.mc.api.wrapper.IItemStack;
+import com.builtbroken.mc.framework.transform.Rotation;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.common.util.ForgeDirection;
 
 /**
  * Prefab for anything that acts as a machine block
@@ -14,19 +13,8 @@ import net.minecraftforge.common.util.ForgeDirection;
  */
 public class TileMachine extends TileEnt implements IRotation
 {
-    /** Direction the machine is facing, try to use {@link #getFacing()} and {@link #setFacing(ForgeDirection)} */
-    protected ForgeDirection facing = ForgeDirection.UNKNOWN;
-
-    /**
-     * Creates a new TileMachine instance
-     *
-     * @param name     - name of the tile
-     * @param material - material of the tile
-     */
-    public TileMachine(String name, Material material)
-    {
-        super(name, material);
-    }
+    /** Direction the machine is facing, try to use {@link #getFacing()} and {@link #setFacing(Rotation)} */
+    protected Rotation facing = Rotation.UNKNOWN;
 
     @Override
     public void firstTick()
@@ -34,12 +22,12 @@ public class TileMachine extends TileEnt implements IRotation
         super.firstTick();
         if (useMetaForFacing())
         {
-            facing = ForgeDirection.getOrientation(world().getBlockMetadata(xi(), yi(), zi()));
+            facing = Rotation.getOrientation(getWorld().getBlockMetadata(xi(), yi(), zi()));
         }
     }
 
     @Override
-    public void onPlaced(EntityLivingBase entityLiving, ItemStack itemStack)
+    public void onPlaced(IEntity entityLiving, IItemStack itemStack)
     {
         super.onPlaced(entityLiving, itemStack);
         setRotationOnPlacement(entityLiving, itemStack);
@@ -51,14 +39,14 @@ public class TileMachine extends TileEnt implements IRotation
      * @param entityLiving
      * @param itemStack
      */
-    protected void setRotationOnPlacement(EntityLivingBase entityLiving, ItemStack itemStack)
+    protected void setRotationOnPlacement(IEntity entityLiving, IItemStack itemStack)
     {
         //TODO implement advanced placement for improved user controls
-        this.setFacing(determineForgeDirection(entityLiving));
+        this.setFacing(entityLiving.getFacingDirection());
     }
 
     @Override
-    public ForgeDirection getDirection()
+    public Rotation getDirection()
     {
         return getFacing();
     }
@@ -76,19 +64,20 @@ public class TileMachine extends TileEnt implements IRotation
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
+    public ISaveTag save(ISaveTag nbt)
     {
-        super.readFromNBT(nbt);
+        super.save(nbt);
         if (!useMetaForFacing())
         {
-            setFacing(ForgeDirection.getOrientation(nbt.getByte("facing")));
+            setFacing(Rotation.getOrientation(nbt.getByte("facing")));
         }
+        return nbt;
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbt)
+    public void load(ISaveTag nbt)
     {
-        super.writeToNBT(nbt);
+        super.load(nbt);
         if (!useMetaForFacing() && getFacing() != null)
         {
             nbt.setByte("facing", (byte) getFacing().ordinal());
@@ -101,7 +90,7 @@ public class TileMachine extends TileEnt implements IRotation
         super.readDescPacket(buf);
         if (!useMetaForFacing())
         {
-            setFacing(ForgeDirection.getOrientation(buf.readByte()));
+            setFacing(Rotation.getOrientation(buf.readByte()));
         }
     }
 
@@ -111,7 +100,7 @@ public class TileMachine extends TileEnt implements IRotation
         super.writeDescPacket(buf);
         if (!useMetaForFacing())
         {
-            buf.writeByte(getFacing() == null ? ForgeDirection.NORTH.ordinal() : getFacing().ordinal());
+            buf.writeByte(getFacing() == null ? Rotation.NORTH.ordinal() : getFacing().ordinal());
         }
     }
 
@@ -120,18 +109,18 @@ public class TileMachine extends TileEnt implements IRotation
      *
      * @return direction
      */
-    public ForgeDirection getFacing()
+    public Rotation getFacing()
     {
         if (facing == null)
         {
             if (useMetaForFacing())
             {
                 //Facing is used as an internal cache of the meta
-                facing = ForgeDirection.getOrientation(getMetadata());
+                facing = Rotation.getOrientation(getWorld().getBlockMetadata(xi(), yi(), zi()));
             }
             else
             {
-                facing = ForgeDirection.NORTH;
+                facing = Rotation.NORTH;
             }
         }
         return facing;
@@ -142,13 +131,13 @@ public class TileMachine extends TileEnt implements IRotation
      *
      * @param facing - direction to face
      */
-    public void setFacing(ForgeDirection facing)
+    public void setFacing(Rotation facing)
     {
         this.facing = facing;
         if (useMetaForFacing())
         {
             //Facing is used as an internal cache of the meta
-            this.setMeta(facing.ordinal());
+            getWorld().setMeta(xi(), yi(), zi(), facing.ordinal());
         }
     }
 }

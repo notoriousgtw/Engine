@@ -2,46 +2,20 @@ package com.builtbroken.mc.prefab.tile;
 
 import com.builtbroken.mc.api.IWorldPosition;
 import com.builtbroken.mc.core.Engine;
-import com.builtbroken.mc.core.network.packet.AbstractPacket;
 import com.builtbroken.mc.core.network.packet.PacketTile;
 import com.builtbroken.mc.core.network.packet.PacketType;
+import com.builtbroken.mc.framework.network.INetPacket;
+import com.builtbroken.mc.framework.network.ITileDesc;
 import com.builtbroken.mc.lib.transform.vector.Location;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
-
-import javax.swing.*;
-import java.awt.*;
 
 /**
  * Created by robert on 1/12/2015.
  */
-public class TileEnt extends Tile
+public class TileEnt extends com.builtbroken.mc.framework.tile.Tile implements ITileDesc
 {
     protected static int DESCRIPTION_PACKET_ID = -1;
-
-    public TileEnt(String name, Material material)
-    {
-        super(name, material);
-    }
-
-    @Override
-    public Tile newTile()
-    {
-        try
-        {
-            if (Engine.runningAsDev && !GraphicsEnvironment.isHeadless())
-            {
-                JOptionPane.showMessageDialog(null, "Class: " + getClass() + " needs to implement the newTile() call! Rather than using reflection!", "InfoBox: Missing newTile()", JOptionPane.INFORMATION_MESSAGE);
-            }
-            return getClass().newInstance();
-        }
-        catch (InstantiationException | IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     /**
      * Reads packet data
@@ -106,7 +80,7 @@ public class TileEnt extends Tile
     }
 
     @Override
-    public AbstractPacket getDescPacket()
+    public INetPacket getDescPacket()
     {
         try
         {

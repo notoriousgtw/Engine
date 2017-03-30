@@ -17,7 +17,7 @@ public class Player extends EntityWrapper<EntityPlayer> implements IPlayer
         super(player);
     }
 
-    protected EntityPlayer getPlayer()
+    public EntityPlayer getPlayer()
     {
         return entity;
     }

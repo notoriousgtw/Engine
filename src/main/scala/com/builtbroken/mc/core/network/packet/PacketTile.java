@@ -1,5 +1,6 @@
 package com.builtbroken.mc.core.network.packet;
 
+import com.builtbroken.mc.api.tile.ITile;
 import com.builtbroken.mc.core.Engine;
 import com.builtbroken.mc.core.network.IPacketIDReceiver;
 import com.builtbroken.mc.core.network.IPacketReceiver;
@@ -54,6 +55,11 @@ public class PacketTile extends PacketType
     public PacketTile(TileEntity tile, Object... args)
     {
         this(tile.xCoord, tile.yCoord, tile.zCoord, args);
+    }
+
+    public PacketTile(ITile tile, Object... args)
+    {
+        this(tile.xi(), tile.yi(), tile.zi(), args);
     }
 
     @Override

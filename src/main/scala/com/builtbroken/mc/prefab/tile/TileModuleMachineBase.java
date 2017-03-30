@@ -1,13 +1,11 @@
 package com.builtbroken.mc.prefab.tile;
 
-import com.builtbroken.mc.api.ISave;
 import com.builtbroken.mc.api.IUpdate;
+import com.builtbroken.mc.api.save.ISave;
+import com.builtbroken.mc.api.save.ISaveTag;
 import com.builtbroken.mc.api.tile.ISided;
 import com.builtbroken.mc.api.tile.ITileModuleProvider;
 import com.builtbroken.mc.api.tile.node.ITileModule;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import java.util.ArrayList;
@@ -25,15 +23,10 @@ public class TileModuleMachineBase extends TileMachine implements ITileModulePro
 {
     protected List<ITileModule> modules = new ArrayList();
 
-    public TileModuleMachineBase(String name, Material material)
-    {
-        super(name, material);
-    }
-
     @Override
-    public void onNeighborChanged(Block block)
+    public void onNeighborChanged(int x, int y, int z)
     {
-        super.onNeighborChanged(block);
+        super.onNeighborChanged(x, y, z);
         for (ITileModule node : getNodes())
         {
             if (node != null)
@@ -44,9 +37,9 @@ public class TileModuleMachineBase extends TileMachine implements ITileModulePro
     }
 
     @Override
-    public void onWorldJoin()
+    public void onAdded()
     {
-        super.onWorldJoin();
+        super.onAdded();
         for (ITileModule node : getNodes())
         {
             if (node != null)
@@ -57,9 +50,9 @@ public class TileModuleMachineBase extends TileMachine implements ITileModulePro
     }
 
     @Override
-    public void update()
+    public void update(boolean tile, long tick, double delta)
     {
-        super.update();
+        super.update(tile, tick, delta);
         for (ITileModule node : getNodes())
         {
             if (node instanceof IUpdate)
@@ -108,9 +101,9 @@ public class TileModuleMachineBase extends TileMachine implements ITileModulePro
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt)
+    public void load(ISaveTag nbt)
     {
-        super.readFromNBT(nbt);
+        super.load(nbt);
         for (ITileModule node : getNodes())
         {
             readFromNBT(node, nbt);
@@ -118,13 +111,14 @@ public class TileModuleMachineBase extends TileMachine implements ITileModulePro
     }
 
     @Override
-    public void writeToNBT(NBTTagCompound nbt)
+    public ISaveTag save(ISaveTag nbt)
     {
-        super.writeToNBT(nbt);
+        super.save(nbt);
         for (ITileModule node : getNodes())
         {
             writeToNBT(node, nbt);
         }
+        return nbt;
     }
 
     /**
@@ -133,7 +127,7 @@ public class TileModuleMachineBase extends TileMachine implements ITileModulePro
      * @param module
      * @param nbt
      */
-    protected void readFromNBT(ITileModule module, NBTTagCompound nbt)
+    protected void readFromNBT(ITileModule module, ISaveTag nbt)
     {
         if (module instanceof ISave)
         {
@@ -147,7 +141,7 @@ public class TileModuleMachineBase extends TileMachine implements ITileModulePro
      * @param module
      * @param nbt
      */
-    protected void writeToNBT(ITileModule module, NBTTagCompound nbt)
+    protected void writeToNBT(ITileModule module, ISaveTag nbt)
     {
         if (module instanceof ISave)
         {
