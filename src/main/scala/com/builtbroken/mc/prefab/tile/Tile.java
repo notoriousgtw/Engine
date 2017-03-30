@@ -73,6 +73,7 @@ import java.util.*;
  * <p>
  * Created by Robert(DarkGuardsman) on 1/4/2015.
  */
+@Deprecated
 public abstract class Tile extends TileEntityBase implements IWorldPosition, IPlayerUsing, IRegistryInit
 {
     //Static block vars, never use in your tile
